@@ -1,0 +1,10 @@
+{
+  "build": {
+    "builder": "railway"
+  },
+  "deploy": {
+    "startCommand": "python manage.py migrate && gunicorn config.wsgi",
+    "restartPolicyType": "on_failure",
+    "restartPolicyMaxRetries": 5
+  }
+}
