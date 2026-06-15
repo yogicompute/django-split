@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Groups{% endblock %}
+{% block content %}
+<h1>All groups</h1>
+<div class="card">
+    <table>
+        <tr><th>Name</th><th>Created by</th><th></th></tr>
+        {% for group in groups %}
+        <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.created_by.username }}</td>
+            <td><a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Open</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+<a class="btn" href="{% url 'expenses:group_create' %}">+ New group</a>
+{% endblock %}

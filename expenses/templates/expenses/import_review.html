@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Review import{% endblock %}
+{% block content %}
+<h1>Review pending rows</h1>
+<p class="muted">These rows were not automatically created. Someone (e.g. Meera) needs to approve or reject what happens to them.</p>
+
+{% for row in pending_rows %}
+<div class="card">
+    <p><strong>Row {{ row.row_number }}:</strong> {{ row.raw_data.description }} ({{ row.raw_data.date }}, {{ row.raw_data.amount }} {{ row.raw_data.currency }})</p>
+    <p>
+        {% for a in row.anomalies %}
+        <span class="anomaly-tag">{{ a }}</span>
+        {% endfor %}
+    </p>
+    <p class="muted">{{ row.action_taken }}</p>
+    <form method="post" style="display:flex; gap:10px;">
+        {% csrf_token %}
+        <input type="hidden" name="row_id" value="{{ row.id }}">
+        <button class="btn" name="action" value="approve" type="submit">Approve / acknowledge</button>
+        <button class="btn danger" name="action" value="reject" type="submit">Reject</button>
+    </form>
+</div>
+{% endfor %}
+
+{% if not pending_rows %}
+<div class="card"><p class="muted">No rows pending review.</p></div>
+{% endif %}
+
+<a class="btn secondary" href="{% url 'expenses:import_report' group.pk batch.pk %}">Back to import report</a>
+{% endblock %}

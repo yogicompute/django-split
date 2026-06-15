@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Your groups</h1>
+{% if not group_data %}
+    <div class="card">
+        <p>You're not in any groups yet.</p>
+        <a class="btn" href="{% url 'expenses:group_create' %}">Create a group</a>
+    </div>
+{% endif %}
+{% for item in group_data %}
+    <div class="card">
+        <h3><a href="{% url 'expenses:group_detail' item.group.pk %}">{{ item.group.name }}</a></h3>
+        {% if item.balance.net > 0 %}
+            <p class="positive">You are owed ₹{{ item.balance.net }}</p>
+        {% elif item.balance.net < 0 %}
+            <p class="negative">You owe ₹{{ item.balance.net|floatformat:2|cut:"-" }}</p>
+        {% else %}
+            <p class="muted">All settled up</p>
+        {% endif %}
+    </div>
+{% endfor %}
+<a class="btn secondary" href="{% url 'expenses:group_create' %}">+ New group</a>
+<a class="btn secondary" href="{% url 'expenses:group_list' %}">All groups</a>
+{% endblock %}

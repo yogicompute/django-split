@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Members - {{ group.name }}{% endblock %}
+{% block content %}
+<h1>{{ group.name }}: Members</h1>
+
+<div class="card">
+    <table>
+        <tr><th>User</th><th>Joined</th><th>Left</th><th>Actions</th></tr>
+        {% for m in memberships %}
+        <tr>
+            <td>{{ m.user.username }}</td>
+            <td>{{ m.joined_on }}</td>
+            <td>{{ m.left_on|default:"-" }}</td>
+            <td>
+                {% if not m.left_on %}
+                <form method="post" style="display:flex; gap:6px; align-items:center;">
+                    {% csrf_token %}
+                    <input type="hidden" name="membership_id" value="{{ m.id }}">
+                    <input type="date" name="left_on" required style="width:140px;">
+                    <button class="btn secondary" name="remove_member" value="1" type="submit">Mark left</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card" style="max-width:480px;">
+    <h3>Add a member</h3>
+    <form method="post">
+        {% csrf_token %}
+        {% for field in add_form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        {% endfor %}
+        <button class="btn" style="margin-top:16px;" name="add_member" value="1" type="submit">Add member</button>
+    </form>
+</div>
+
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Back to group</a>
+{% endblock %}

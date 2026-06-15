@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Balance - {{ target_user.username }}{% endblock %}
+{% block content %}
+<h1>Balance for {{ target_user.username }} in {{ group.name }}</h1>
+
+<div class="card">
+    <select onchange="window.location.href='?user='+this.value">
+        {% for m in members %}
+        <option value="{{ m.id }}" {% if m.id == target_user.id %}selected{% endif %}>{{ m.username }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="card">
+    {% if balance.net > 0 %}
+        <h2 class="positive">Is owed ₹{{ balance.net }} overall</h2>
+    {% elif balance.net < 0 %}
+        <h2 class="negative">Owes ₹{{ balance.net|floatformat:2|cut:"-" }} overall</h2>
+    {% else %}
+        <h2 class="muted">Settled up</h2>
+    {% endif %}
+
+    {% if balance.owed_by_user %}
+        <h3>Owes</h3>
+        <ul>
+            {% for t in balance.owed_by_user %}
+            <li>₹{{ t.amount }} to {{ t.to_user.username }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if balance.owed_to_user %}
+        <h3>Is owed</h3>
+        <ul>
+            {% for t in balance.owed_to_user %}
+            <li>₹{{ t.amount }} from {{ t.from_user.username }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Exactly which expenses make up this balance</h3>
+    <table>
+        <tr><th>Date</th><th>Description</th><th>Total (₹)</th><th>Their share (₹)</th><th>They paid (₹)</th><th>Net effect (₹)</th></tr>
+        {% for row in breakdown %}
+        <tr>
+            <td>{{ row.expense.date }}</td>
+            <td><a href="{% url 'expenses:expense_detail' group.pk row.expense.id %}">{{ row.expense.description }}</a></td>
+            <td>{{ row.expense.amount_inr }}</td>
+            <td>{{ row.share_amount }}</td>
+            <td>{{ row.paid_amount }}</td>
+            <td class="{% if row.net_effect > 0 %}positive{% elif row.net_effect < 0 %}negative{% endif %}">{{ row.net_effect }}</td>
+        </tr>
+        {% endfor %}
+        {% if not breakdown %}
+        <tr><td colspan="6" class="muted">No expenses involve this person.</td></tr>
+        {% endif %}
+    </table>
+    <p class="muted">Net effect = amount they paid minus their share of the expense. Positive means it increases what others owe them; negative means it increases what they owe others. Settlements (cash payments) are reflected in the overall balance above but are not itemized in this expense table.</p>
+</div>
+
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Back to group</a>
+{% endblock %}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Flatmate Expenses{% endblock %}</title>
+    <style>
+        :root {
+            --bg: #f6f7f9;
+            --card: #ffffff;
+            --border: #e1e4e8;
+            --text: #1f2328;
+            --muted: #6b7280;
+            --primary: #2563eb;
+            --green: #16a34a;
+            --red: #dc2626;
+            --orange: #d97706;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+        }
+        nav {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            margin-right: 16px;
+            font-weight: 500;
+        }
+        nav a:hover { color: var(--primary); }
+        .container {
+            max-width: 900px;
+            margin: 24px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+        h1, h2, h3 { margin-top: 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.92em;
+        }
+        th { color: var(--muted); font-weight: 600; }
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .btn.secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn.danger { background: var(--red); }
+        .positive { color: var(--green); font-weight: 600; }
+        .negative { color: var(--red); font-weight: 600; }
+        .muted { color: var(--muted); font-size: 0.88em; }
+        label { display: block; margin: 10px 0 4px; font-weight: 500; font-size: 0.92em; }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95em;
+        }
+        .messages { list-style: none; padding: 0; }
+        .messages li {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+        .messages .success { background: #dcfce7; color: #166534; }
+        .messages .error { background: #fee2e2; color: #991b1b; }
+        .messages .warning { background: #fef3c7; color: #92400e; }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .badge.created { background: #dcfce7; color: #166534; }
+        .badge.skipped { background: #f3f4f6; color: #4b5563; }
+        .badge.pending { background: #fef3c7; color: #92400e; }
+        .badge.approved { background: #dbeafe; color: #1e40af; }
+        .badge.rejected { background: #fee2e2; color: #991b1b; }
+        .anomaly-tag {
+            display: inline-block;
+            background: #f3f4f6;
+            border-radius: 4px;
+            padding: 1px 6px;
+            font-size: 0.75em;
+            margin: 2px;
+            color: #4b5563;
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<nav>
+    <div>
+        <a href="{% url 'expenses:dashboard' %}">Home</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'expenses:group_list' %}">Groups</a>
+        {% endif %}
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+            <span class="muted">{{ user.username }}</span>
+            <a href="{% url 'accounts:logout' %}">Logout</a>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:signup' %}">Sign up</a>
+        {% endif %}
+    </div>
+</nav>
+<div class="container">
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

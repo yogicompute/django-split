@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Import CSV{% endblock %}
+{% block content %}
+<h1>Import expenses_export.csv into {{ group.name }}</h1>
+<div class="card" style="max-width:480px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        {% endfor %}
+        <button class="btn" style="margin-top:16px;" type="submit">Import</button>
+    </form>
+    <p class="muted" style="margin-top:10px;">The file is processed as-is. Every row is checked for known data problems (duplicates, currency issues, bad dates, settlements logged as expenses, etc.) and a full report is produced after import.</p>
+</div>
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Back</a>
+{% endblock %}

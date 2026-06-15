@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ expense.description }}{% endblock %}
+{% block content %}
+<h1>{{ expense.description }}</h1>
+
+<div class="card">
+    <p><strong>Date:</strong> {{ expense.date }}</p>
+    <p><strong>Paid by:</strong> {{ expense.paid_by.username }}</p>
+    <p><strong>Amount:</strong> ₹{{ expense.amount_inr }}
+        {% if expense.original_currency != "INR" %}
+            <span class="muted">(originally {{ expense.original_amount }} {{ expense.original_currency }}, converted at {{ expense.fx_rate_to_inr }})</span>
+        {% endif %}
+    </p>
+    <p><strong>Split type:</strong> {{ expense.get_split_type_display }}</p>
+    {% if expense.is_refund %}<p class="muted">Recorded as a refund (negative amount).</p>{% endif %}
+    {% if expense.notes %}<p><strong>Notes:</strong> {{ expense.notes }}</p>{% endif %}
+</div>
+
+<div class="card">
+    <h3>Exactly what makes up this expense</h3>
+    <table>
+        <tr><th>Member</th><th>Share (₹)</th></tr>
+        {% for s in shares %}
+        <tr>
+            <td>{{ s.user.username }}</td>
+            <td>{{ s.share_amount_inr }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Back</a>
+<a class="btn danger" href="{% url 'expenses:expense_delete' group.pk expense.id %}">Delete</a>
+{% endblock %}

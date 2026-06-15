@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Import report{% endblock %}
+{% block content %}
+<h1>Import report</h1>
+
+<div class="card">
+    <p><strong>File:</strong> {{ batch.filename }}</p>
+    <p><strong>Imported by:</strong> {{ batch.imported_by.username }} on {{ batch.imported_at }}</p>
+    <p><strong>Total rows:</strong> {{ batch.total_rows }}</p>
+    <p><span class="badge created">created</span> {{ batch.rows_created }} &nbsp;
+       <span class="badge skipped">skipped</span> {{ batch.rows_skipped }} &nbsp;
+       <span class="badge pending">pending review</span> {{ batch.rows_pending }}</p>
+    {% if batch.rows_pending %}
+    <a class="btn" href="{% url 'expenses:import_review' group.pk batch.pk %}">Review pending rows</a>
+    {% endif %}
+</div>
+
+<div class="card">
+    <table>
+        <tr><th>Row</th><th>Description</th><th>Status</th><th>Anomalies detected</th><th>Action taken</th></tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.row_number }}</td>
+            <td>{{ row.raw_data.description }}</td>
+            <td><span class="badge {{ row.status }}">{{ row.status }}</span></td>
+            <td>
+                {% for a in row.anomalies %}
+                <span class="anomaly-tag">{{ a }}</span>
+                {% endfor %}
+                {% if not row.anomalies %}<span class="muted">none</span>{% endif %}
+            </td>
+            <td class="muted">{{ row.action_taken|default:"-" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Back to group</a>
+{% endblock %}

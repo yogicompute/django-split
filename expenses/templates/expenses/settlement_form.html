@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Record payment{% endblock %}
+{% block content %}
+<h1>Record a payment in {{ group.name }}</h1>
+<div class="card" style="max-width:480px;">
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <label>{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+        {% endfor %}
+        <button class="btn" style="margin-top:16px;" type="submit">Save payment</button>
+    </form>
+</div>
+<a class="btn secondary" href="{% url 'expenses:group_detail' group.pk %}">Cancel</a>
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }}{% endblock %}
+{% block content %}
+<h1>{{ group.name }}</h1>
+
+<div class="card">
+    <h3>Who pays whom</h3>
+    {% if summary.transactions %}
+        <table>
+            <tr><th>From</th><th>To</th><th>Amount</th></tr>
+            {% for t in summary.transactions %}
+            <tr>
+                <td>{{ t.from_user.username }}</td>
+                <td>{{ t.to_user.username }}</td>
+                <td>₹{{ t.amount }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p class="muted">Everyone is settled up.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>Individual balances</h3>
+    <table>
+        <tr><th>Member</th><th>Net position</th><th></th></tr>
+        {% for mb in summary.member_balances %}
+        <tr>
+            <td>{{ mb.user.username }}</td>
+            <td>
+                {% if mb.net > 0 %}
+                    <span class="positive">+₹{{ mb.net }} (is owed)</span>
+                {% else %}
+                    <span class="negative">-₹{{ mb.net|floatformat:2|cut:"-" }} (owes)</span>
+                {% endif %}
+            </td>
+            <td><a class="btn secondary" href="{% url 'expenses:balance_detail' group.pk %}?user={{ mb.user.id }}">Details</a></td>
+        </tr>
+        {% endfor %}
+        {% if not summary.member_balances %}
+        <tr><td colspan="3" class="muted">No balances yet.</td></tr>
+        {% endif %}
+    </table>
+</div>
+
+<div class="card">
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn" href="{% url 'expenses:expense_create' group.pk %}">+ Add expense</a>
+        <a class="btn secondary" href="{% url 'expenses:settlement_create' group.pk %}">Record a payment</a>
+        <a class="btn secondary" href="{% url 'expenses:group_members' group.pk %}">Members</a>
+        <a class="btn secondary" href="{% url 'expenses:import_csv' group.pk %}">Import CSV</a>
+        <a class="btn secondary" href="{% url 'expenses:balance_detail' group.pk %}">My balance</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Members</h3>
+    <table>
+        <tr><th>User</th><th>Joined</th><th>Left</th></tr>
+        {% for m in memberships %}
+        <tr>
+            <td>{{ m.user.username }}</td>
+            <td>{{ m.joined_on }}</td>
+            <td>{{ m.left_on|default:"still here" }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="card">
+    <h3>Recent expenses</h3>
+    <table>
+        <tr><th>Date</th><th>Description</th><th>Paid by</th><th>Amount (₹)</th><th>Split</th><th></th></tr>
+        {% for e in expenses %}
+        <tr>
+            <td>{{ e.date }}</td>
+            <td>{{ e.description }}{% if e.original_currency != "INR" %} <span class="muted">({{ e.original_amount }} {{ e.original_currency }})</span>{% endif %}</td>
+            <td>{{ e.paid_by.username }}</td>
+            <td>{{ e.amount_inr }}</td>
+            <td>{{ e.get_split_type_display }}</td>
+            <td><a class="btn secondary" href="{% url 'expenses:expense_detail' group.pk e.id %}">View</a></td>
+        </tr>
+        {% endfor %}
+        {% if not expenses %}
+        <tr><td colspan="6" class="muted">No expenses yet.</td></tr>
+        {% endif %}
+    </table>
+</div>
+
+<div class="card">
+    <h3>Recent settlements</h3>
+    <table>
+        <tr><th>Date</th><th>From</th><th>To</th><th>Amount (₹)</th><th>Notes</th></tr>
+        {% for s in settlements %}
+        <tr>
+            <td>{{ s.date }}</td>
+            <td>{{ s.paid_by.username }}</td>
+            <td>{{ s.paid_to.username }}</td>
+            <td>{{ s.amount_inr }}</td>
+            <td class="muted">{{ s.notes }}</td>
+        </tr>
+        {% endfor %}
+        {% if not settlements %}
+        <tr><td colspan="5" class="muted">No payments recorded yet.</td></tr>
+        {% endif %}
+    </table>
+</div>
+{% endblock %}
