@@ -17,6 +17,10 @@ from .models import (
 )
 
 
+def home(request):
+    return render(request, 'expenses/home.html')
+
+
 @login_required
 def dashboard(request):
     groups = Group.objects.filter(memberships__user=request.user).distinct()

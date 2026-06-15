@@ -4,7 +4,8 @@ from . import views
 app_name = 'expenses'
 
 urlpatterns = [
-    path('', views.dashboard, name='dashboard'),
+    path('', views.home, name='home'),
+    path('dashboard/', views.dashboard, name='dashboard'),
     path('groups/', views.group_list, name='group_list'),
     path('groups/new/', views.group_create, name='group_create'),
     path('groups/<int:pk>/', views.group_detail, name='group_detail'),
