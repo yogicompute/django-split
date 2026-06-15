@@ -1,13 +1,12 @@
 import os
 from pathlib import Path
-from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security settings
-SECRET_KEY = config('SECRET_KEY', default='django-insecure-gq9l$do78$p$@vlpb2j^k-k(86jgggv4muwu+l7)9j8(srhgz5')
-DEBUG = config('DEBUG', default=False, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# Security settings - use environment variables, fall back to defaults for local dev
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-gq9l$do78$p$@vlpb2j^k-k(86jgggv4muwu+l7)9j8(srhgz5')
+DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,7 +21,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -52,10 +50,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database configuration - supports both SQLite (dev) and PostgreSQL (production)
-if config('DATABASE_URL', default=None):
+if os.getenv('DATABASE_URL'):
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.config(default=config('DATABASE_URL'))
+        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
     }
 else:
     DATABASES = {
@@ -80,7 +78,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -88,7 +85,7 @@ LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'expenses:dashboard'
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
-USD_TO_INR_RATE = config('USD_TO_INR_RATE', default=87.00, cast=float)
+USD_TO_INR_RATE = float(os.getenv('USD_TO_INR_RATE', '87.00'))
 
 # Security settings for production
 if not DEBUG:
