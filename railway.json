@@ -1,10 +1,11 @@
 {
+  "$schema": "https://railway.com/railway.schema.json",
   "build": {
-    "builder": "railway"
+    "builder": "RAILPACK"
   },
   "deploy": {
     "startCommand": "python manage.py migrate && gunicorn config.wsgi",
-    "restartPolicyType": "on_failure",
+    "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 5
   }
 }
