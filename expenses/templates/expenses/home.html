@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Welcome — Flatmate Expenses{% endblock %}
+{% block content %}
+<div class="card" style="text-align: center; padding: 48px 32px;">
+    <h1 style="font-size: 2em; margin-bottom: 8px;">Flatmate Expenses</h1>
+    <p class="muted" style="font-size: 1.05em; margin-bottom: 32px;">
+        Track shared expenses, split bills fairly, and settle up with your flatmates — all in one place.
+    </p>
+    {% if user.is_authenticated %}
+        <a class="btn" href="{% url 'expenses:dashboard' %}">Go to Dashboard</a>
+    {% else %}
+        <a class="btn" href="{% url 'accounts:login' %}" style="margin-right: 8px;">Log in</a>
+        <a class="btn secondary" href="{% url 'accounts:signup' %}">Sign up</a>
+    {% endif %}
+</div>
+
+<div class="grid-2" style="margin-top: 24px;">
+    <div class="card">
+        <h3>💸 Split expenses</h3>
+        <p class="muted">Add shared bills and split them equally, by percentage, by share, or custom amounts.</p>
+    </div>
+    <div class="card">
+        <h3>📊 Track balances</h3>
+        <p class="muted">See at a glance who owes what across all your groups, with a full per-expense breakdown.</p>
+    </div>
+    <div class="card">
+        <h3>✅ Settle up</h3>
+        <p class="muted">Record payments between flatmates to keep balances accurate and everyone on the same page.</p>
+    </div>
+    <div class="card">
+        <h3>📥 Import CSV</h3>
+        <p class="muted">Bulk-import past expenses from a CSV file and review any rows that need attention.</p>
+    </div>
+</div>
+{% endblock %}
